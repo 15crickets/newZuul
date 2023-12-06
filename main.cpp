@@ -1,3 +1,12 @@
+/*
+    Author: Vikram Vasudevan
+    Date: 12/5/2023
+    Description: This program is for a game, where a player must move through different 'rooms' in the Harry Potter world in order to recover Harry Potter's broomstick for him
+    In the game, players can move around, and pick up and drop items. Certain rooms can only be entered if the user has certain items. To win, the broomstick must be dropped in the Great Hall room.
+    Citations: https://www.geeksforgeeks.org/map-associative-containers-the-c-standard-template-library-stl/
+        This website helped me learn what maps are, and how to use them.
+*/
+
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -5,20 +14,20 @@
 #include "room.h"
 #include "item.h"
 
-
 using namespace std;
+//function prototype
 void printExits(room* currentRoom);
 
-
+//main
 int main (){
-
+    //introduction
     cout << "Hello player. You are currently in Hogwarts castle, and Harry Potter needs your help! The notorious Dolores Umbridge has confiscated his broomstick, and he might be expelled if he's suspected of stealing it back from her. He needs you to find his broomstick and bring it back to him in the Great Hall. Good luck!" << endl;
-  
-    vector <room*> rooms;
+    //initializing inventory array
     int inventory[6];
     for(int i = 0; i < 6; i++){
         inventory[i] = 0;
     }
+    //initializing items and rooms
     item* key = new item();
     item* broomstick = new item();
     item* candy = new item();
@@ -43,6 +52,7 @@ int main (){
     char direction[30];
 
 
+    //entering room information for each room, including the name, description, exits, and items.
     strcpy(entrance->name, "Entrance Hall");
     strcpy(entrance->description, "You are in the Entrance Hall. Go forth and find Harry's broomstick! Or, if you already have it, drop the broomstick in this room.");
     entrance->setExit(entrance->north, great_hall);
@@ -134,6 +144,7 @@ int main (){
     filch_secret_lair->item[4] = 1;
 
 
+    //setting the exits that haven't already been set to NULL for each room.
     entrance->setInitialExit();
     great_hall->setInitialExit();
     bridge->setInitialExit();
@@ -150,59 +161,51 @@ int main (){
     filch_office->setInitialExit();
     filch_secret_lair->setInitialExit();
 
-
-
-
-    rooms.push_back(entrance);
-    rooms.push_back(bridge);
-    rooms.push_back(hagrid_hut);
-    rooms.push_back(great_hall);
-    rooms.push_back(honeydukes);
-    rooms.push_back(hogsmeade);
-    rooms.push_back(shrieking_shack);
-    rooms.push_back(staircase);
-    rooms.push_back(corridor);
-    rooms.push_back(umbridge_office);
-    rooms.push_back(umbridge_dungeon);
-    rooms.push_back(room_of_requirement);
-    rooms.push_back(potion_room);
-    rooms.push_back(filch_office);
-    rooms.push_back(filch_secret_lair);
-
+    //setting the current room to entrance
     room* currentRoom = entrance;
 
   bool running = true;
+  //while loop in which the game is played.
   while (running == true){
     cout << endl;
+    //prompting user to input a command.
     cout << "What would you like to do? Type 'help' to see all commands" << endl;
     char userCommand [30];
     cin.get(userCommand, 30);
     cin.get();
+    //this if statement controls what happens if the user enters "help"
     if(strcmp(userCommand, "help") == 0){
       cout << "Your commands are: help, go, inventory, get, drop, quit" << endl;
     
-
     }
+    //this if statement controls what happens if the user enters "go"
     if(strcmp(userCommand, "go") == 0){
+    //prompting the user to enter a direction
       cout << "Which direction would you like to go? north/south/east/west" << endl;
       bool validDirection = false;
+
       while(validDirection == false){
         char goDir [40];
         cin.get(goDir, 40);
         cin.get();
         if(strcmp(goDir, "north") == 0){
+            //if north is a valid direction, and the room that you are going north into is available to you, you may enter it. If the room is not available to you because you don't have the required items, then you may not enter it.
           if(currentRoom->roomsMap[currentRoom->north] != NULL){
             
             if(currentRoom->roomsMap[currentRoom->north] == umbridge_office && (inventory[4] !=1)){
                 cout << "The door to Umbridge's office is locked. You're going to need a key to get in here" << endl;
             }
             else{
+                //changing current room
                 currentRoom = currentRoom->roomsMap[currentRoom->north];
                 cout << endl;
+                //outputting room description
                 cout << currentRoom->description << endl;
                 cout << endl;
+                //printing exits
                 printExits(currentRoom);
                 cout << endl;
+                //printing items in room
                 currentRoom->printItems();
                 validDirection = true;
             }
@@ -210,6 +213,7 @@ int main (){
           }
 
         }
+        //south, east, and west all have the same format as north
         else if(strcmp(goDir, "south") == 0){
           if(currentRoom->roomsMap[currentRoom->south] != NULL){
 
@@ -264,11 +268,14 @@ int main (){
     }
         
     }
+    //this if statement controls what happens if the user inputs "get"
     else if(strcmp(userCommand, "get")==0){
+        //prompt the user to determine what item they would like to pick up
         cout << "What item would you like to pick up? " << endl;
         char itemPickUp [30];
         cin.get(itemPickUp, 30);
         cin.get();
+        //this series of if statements checks to see if the given item is in the currentRoom. If it is, then the item is removed from the currentRoom and placed in the user's inventory.
         if(strcmp(itemPickUp, "cakes") == 0){
             if(currentRoom->item[0] == 1){
                 
@@ -335,11 +342,14 @@ int main (){
         }
 
     }
+    //this if statement determines what happens if the user inputs "drop"
     else if(strcmp(userCommand, "drop") == 0){
+        //prompting the user to enter which item they would like to drop
         cout << "What item would you like to drop? " << endl;
         char itemDrop[30];
         cin.get(itemDrop, 30);
         cin.get();
+        //this series of if statements checks to see if the given object is in the user's inventory. If it is, the item is removed from the inventory and placed in the currentRoom.
         if(strcmp(itemDrop, "cakes") == 0){
             if(inventory[0] == 1){
                 currentRoom->item[0] = 1;
@@ -406,9 +416,11 @@ int main (){
             }
         }
     }
+    //this if statement controls what happens if the user inputs "inventory"
     else if(strcmp(userCommand, "inventory") == 0){
         cout << "Inventory: " << endl;
         cout << endl;
+        //this series of if statements prints out the items that are currently in the user's inventory.
         if(inventory[0] == 1){
             cout << "cakes" << endl;
         }
@@ -429,6 +441,7 @@ int main (){
             cout << "broomstick" << endl;
         }
     }
+    //this if statement ends the game if the user inputs "quit"
     else if(strcmp(userCommand, "quit") == 0){
         running = false;
     }
@@ -436,6 +449,7 @@ int main (){
     }
 
   }
+  //this function prints out all of the valid exits connected to a given room, currentRoom.
   void printExits(room* currentRoom){
     cout << "Exits: " << endl;
     if(currentRoom->roomsMap[currentRoom->west] != NULL){

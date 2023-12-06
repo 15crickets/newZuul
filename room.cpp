@@ -6,10 +6,12 @@
 using namespace std;
 
 
+//constructor
 room::room(){
     for(int i = 0; i < 6; i++){
         item[i] = 0;
     }
+//setting char pointers to actual strings
   north = new char [10];
   south = new char [10];
   east = new char [10];
@@ -33,6 +35,7 @@ room::room(){
   strcpy(broomstick, "broomstick");
 
 }
+//this function sets exits that don't have actual rooms to NULL.
 void room::setInitialExit(){
 
   if(roomsMap.find(north) == roomsMap.end()){
@@ -51,6 +54,7 @@ void room::setInitialExit(){
     roomsMap.insert(pair<char*, room*> (west, NULL));
   }
 }
+//this function sets an exit to a room.
 void room::setExit(char* dir, room* tempRoom){
   
 
@@ -58,6 +62,7 @@ void room::setExit(char* dir, room* tempRoom){
 
 
 }
+//this function prints the items that are currently in a room.
 void room::printItems(){
     cout << "Items: " << endl;
 

@@ -8,7 +8,10 @@
 using namespace std;
 class item{
   public:
+  //constructor
+
     item();
+    //item name
     char name[40];
 
 

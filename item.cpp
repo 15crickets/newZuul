@@ -5,14 +5,8 @@
 #include "item.h"
 using namespace std;
 
-
+//constructor
 item::item(){
-//cakes
-//pops
-//cloak
-//potion
-//key
-//broomstick
 
 
 }
