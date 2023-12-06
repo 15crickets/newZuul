@@ -35,9 +35,6 @@ room::room(){
 }
 void room::setInitialExit(){
 
-
-
-
   if(roomsMap.find(north) == roomsMap.end()){
     roomsMap.insert(pair<char*, room*> (north, NULL));
   }

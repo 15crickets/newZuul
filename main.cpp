@@ -6,12 +6,13 @@
 #include "item.h"
 
 
-
-
 using namespace std;
+void printExits(room* currentRoom);
 
 
 int main (){
+
+    cout << "Hello player. You are currently in Hogwarts castle, and Harry Potter needs your help! The notorious Dolores Umbridge has confiscated his broomstick, and he might be expelled if he's suspected of stealing it back from her. He needs you to find his broomstick and bring it back to him in the Great Hall. Good luck!" << endl;
   
     vector <room*> rooms;
     int inventory[6];
@@ -60,64 +61,77 @@ int main (){
     bridge->setExit(bridge->west, hogsmeade);
 
     strcpy(hagrid_hut->name, "Hagrid's Hut");
-
+    strcpy(hagrid_hut->description, "You are in Hagrid's hut! He has some rock cakes you might be interested in. Don't forget to say 'hi' to Buckbeak.");
     hagrid_hut->setExit(hagrid_hut->north, bridge);
     hagrid_hut->item[0] = 1;
 
 
     strcpy(honeydukes->name, "Honeydukes");
+    strcpy(honeydukes->description, "You are in Honeydukes, the famous candy shop. Acid Pops are highly discounted, want to take one? ");
     honeydukes->setExit(honeydukes->north, hogsmeade);
 
     honeydukes->item[1] = 1;
 
 
     strcpy(hogsmeade->name, "Hogsmeade");
+    strcpy(hogsmeade->description, "You are in Hogsmeade, the famous village outside of Hogwarts. There are lots of great shops here. Feel free to explore! ");
 
     hogsmeade->setExit(hogsmeade->south, honeydukes);
     hogsmeade->setExit(hogsmeade->east, bridge);
     hogsmeade->setExit(hogsmeade->north, shrieking_shack);
 
     strcpy(shrieking_shack->name, "Shrieking Shack");
+    strcpy(shrieking_shack->description, "You're in the Shrieking Shack. It's a little unnerving in here, I'd leave as soon as possible if I were you");
     shrieking_shack->setExit(shrieking_shack->south, hogsmeade);
 
     strcpy(staircase->name, "Staircase");
+    strcpy(staircase->description, "You're in a staircase in Hogwarts ");
     staircase->setExit(staircase->east, great_hall);
     staircase->setExit(staircase->north, corridor);
 
     strcpy(corridor->name, "Corridor");
+    strcpy(corridor->description, "You're in a corridor on one of the upper floors of the castle. Plenty of important-looking rooms up here... ");
+
     corridor->setExit(corridor->south, staircase);
     corridor->setExit(corridor->north, umbridge_office);
     corridor->setExit(corridor->east, room_of_requirement);
 
 
     strcpy(umbridge_office->name, "Umbridge's Office");
+    strcpy(umbridge_office->description, "You're in Umbridge's office. Be careful, you don't want to get caught");
     umbridge_office->setExit(umbridge_office->south, corridor);
     umbridge_office->setExit(umbridge_office->east, umbridge_dungeon);
 
     strcpy(umbridge_dungeon->name, "Umbridge's Dungeon");
+    strcpy(umbridge_dungeon->description, "Woah, Umbridge has a secret dungeon. There are two trolls here, luckily you have that invisibility cloak. And look, there's Harry's broomstick! You need to get that back to the Great Hall for him!");
     umbridge_dungeon->setExit(umbridge_dungeon->west, umbridge_office);
     umbridge_dungeon->item[5] = 1;
 
 
     strcpy(room_of_requirement->name, "Room of Requirement");
+    strcpy(room_of_requirement->description, "You are in the Room of Requirement. You can think of anything that you need and the room will give it to you. Oh look, I think the room's found something for you...");
+
     room_of_requirement->setExit(room_of_requirement->west, corridor);
     room_of_requirement->setExit(room_of_requirement->east, potion_room);
     room_of_requirement->item[2] = 1;
 
 
-    strcpy(potion_room->name, "Potion's Room");
+    strcpy(potion_room->name, "Potions Room");
+    strcpy(potion_room->description, "You're in the Potions Room. Looks like Fred and George are in here too. They look like they have something brewing over there that they'd like to give you...");
     potion_room->setExit(potion_room->west, room_of_requirement);
     potion_room->setExit(potion_room->south, filch_office);
     potion_room->item[3] = 1;
 
 
     strcpy(filch_office->name, "Filch's Office");
+    strcpy(filch_office->description, "You are in Filch's office. Luckily he isn't here right now. You might want to slip that sleeping potion into his tea to make sure he doesn't catch you too quickly when he comes back");
     filch_office->setExit(filch_office->north, potion_room);
     filch_office->setExit(filch_office->south, filch_secret_lair);
 
     strcpy(filch_secret_lair->name, "Filch's Secret Lair");
+    strcpy(filch_secret_lair->description, "You are in Filch's secret lair! And look, there's a key!");
     filch_secret_lair->setExit(filch_secret_lair->north, filch_office);
-    potion_room->item[4] = 1;
+    filch_secret_lair->item[4] = 1;
 
 
     entrance->setInitialExit();
@@ -155,15 +169,15 @@ int main (){
     rooms.push_back(filch_office);
     rooms.push_back(filch_secret_lair);
 
-    room* currentRoom = honeydukes;
+    room* currentRoom = entrance;
 
   bool running = true;
   while (running == true){
+    cout << endl;
     cout << "What would you like to do? Type 'help' to see all commands" << endl;
     char userCommand [30];
     cin.get(userCommand, 30);
     cin.get();
-    //help go inventory get drop quit
     if(strcmp(userCommand, "help") == 0){
       cout << "Your commands are: help, go, inventory, get, drop, quit" << endl;
     
@@ -178,27 +192,51 @@ int main (){
         cin.get();
         if(strcmp(goDir, "north") == 0){
           if(currentRoom->roomsMap[currentRoom->north] != NULL){
-            currentRoom = currentRoom->roomsMap[currentRoom->north];
-            cout << "Place: " << currentRoom->name << endl;
-            cout << endl;
-            currentRoom->printItems();
-            validDirection = true;
+            
+            if(currentRoom->roomsMap[currentRoom->north] == umbridge_office && (inventory[4] !=1)){
+                cout << "The door to Umbridge's office is locked. You're going to need a key to get in here" << endl;
+            }
+            else{
+                currentRoom = currentRoom->roomsMap[currentRoom->north];
+                cout << endl;
+                cout << currentRoom->description << endl;
+                cout << endl;
+                printExits(currentRoom);
+                cout << endl;
+                currentRoom->printItems();
+                validDirection = true;
+            }
+
           }
+
         }
         else if(strcmp(goDir, "south") == 0){
           if(currentRoom->roomsMap[currentRoom->south] != NULL){
-            currentRoom = currentRoom->roomsMap[currentRoom->south];
-            cout << "Place: " << currentRoom->name << endl;
-            cout << endl;
-            currentRoom->printItems();
-            validDirection = true;
+
+            if(currentRoom->roomsMap[currentRoom->south] == filch_office && (inventory[3] != 1)){
+                cout << "You're going to need a sleeping potion before you enter Filch's office..." << endl;
+            }
+            else{
+                currentRoom = currentRoom->roomsMap[currentRoom->south];
+                cout << endl;
+                cout << currentRoom->description << endl;
+                cout << endl;
+                printExits(currentRoom);
+                cout << endl;
+                currentRoom->printItems();
+                validDirection = true;
+            }
+
           }
 
         }
         else if(strcmp(goDir, "west") == 0){
           if(currentRoom->roomsMap[currentRoom->west] != NULL){
             currentRoom = currentRoom->roomsMap[currentRoom->west];
-            cout << "Place: " << currentRoom->name << endl;
+            cout << endl;
+            cout << currentRoom->description << endl;
+            cout << endl;
+            printExits(currentRoom);
             cout << endl;
             currentRoom->printItems();
             validDirection = true;
@@ -206,16 +244,24 @@ int main (){
         }
         else if(strcmp(goDir, "east") == 0){
           if(currentRoom->roomsMap[currentRoom->east] != NULL){
-            currentRoom = currentRoom->roomsMap[currentRoom->east];
-            cout << "Place: " << currentRoom->name << endl;
-            cout << endl;
-            currentRoom->printItems();
-            validDirection = true;
+            if(currentRoom->roomsMap[currentRoom->east] == potion_room && (inventory[0] != 1 || inventory[1] != 1)){
+                cout << "Fred and George are in the Potions Room. They won't let you in unless you get them some sweets, preferably some candy and some rock cakes" << endl;
+            }
+            else{
+                currentRoom = currentRoom->roomsMap[currentRoom->east];
+                cout << endl;
+                cout << currentRoom->description << endl;
+                cout << endl;
+                printExits(currentRoom);
+                cout << endl;
+                currentRoom->printItems();
+                validDirection = true;
+            }
+            
           }
     
         }
     }
-       
         
     }
     else if(strcmp(userCommand, "get")==0){
@@ -350,13 +396,19 @@ int main (){
                 inventory[5] = 0;
 
             }
+            if(strcmp(currentRoom->name, "Great Hall") == 0){
+                cout << endl;
+                cout << "YOU WIN!!!" << endl;
+                running = false;
+            }
             else{
                 cout << "You do not have this item" << endl;
             }
         }
     }
-    else if(strcmp(userCommand, "inventory")){
-        cout << "Inventory" << endl;
+    else if(strcmp(userCommand, "inventory") == 0){
+        cout << "Inventory: " << endl;
+        cout << endl;
         if(inventory[0] == 1){
             cout << "cakes" << endl;
         }
@@ -377,11 +429,27 @@ int main (){
             cout << "broomstick" << endl;
         }
     }
+    else if(strcmp(userCommand, "quit") == 0){
+        running = false;
+    }
     
     }
 
-
-
+  }
+  void printExits(room* currentRoom){
+    cout << "Exits: " << endl;
+    if(currentRoom->roomsMap[currentRoom->west] != NULL){
+        cout << "west" << endl;
+    }
+    if(currentRoom->roomsMap[currentRoom->north] != NULL){
+        cout << "north" << endl;
+    }
+    if(currentRoom->roomsMap[currentRoom->south] != NULL){
+        cout << "south" << endl;
+    }
+    if(currentRoom->roomsMap[currentRoom->east] != NULL){
+        cout << "east" << endl;
+    }
 
   }
 
